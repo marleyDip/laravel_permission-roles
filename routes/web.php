@@ -4,6 +4,7 @@ use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PermissionController;
 use App\Http\Controllers\RoleController;
+use App\Http\Controllers\SocialiteController;
 use App\Http\Controllers\UserController;
 
 use Illuminate\Support\Facades\Route;
@@ -15,6 +16,12 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return view('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+// Social Login Routes (Facebook, Google, GitHub, LinkedIn)
+Route::controller(SocialiteController::class)->group(function() {
+    Route::get('auth/redirection/{provider}', 'authProviderRedirect')->name('auth.redirection');
+    Route::get('auth/{provider}/callback', 'socialAuthentication')->name('auth.callback');
+});
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -45,7 +52,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/articles/{id}', [ArticleController::class, 'update'])->name('articles.update');
     Route::delete('/articles', [ArticleController::class, 'destroy'])->name('articles.destroy');
 
-    // Article Routes
+    // Users Routes
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
     Route::post('/users', [UserController::class, 'store'])->name('users.store');
